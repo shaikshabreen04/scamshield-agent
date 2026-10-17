@@ -45,6 +45,7 @@ class PlanningEngine:
         tool_priority = [
             "extract_urls",
             "check_url_shorteners",
+            "detect_credential_harvesting",
             "analyze_urgency_cues",
             "detect_financial_requests",
             "identify_impersonation",

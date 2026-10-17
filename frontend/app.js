@@ -586,7 +586,7 @@ function renderAnalysisResultCard(data) {
   }
 
   // 3. Detected Warning Signs & Quoted Evidence
-  const flags = Array.isArray(data.identified_flags) ? data.identified_flags : [];
+  const flags = Array.isArray(data.warning_signs) ? data.warning_signs : (Array.isArray(data.identified_flags) ? data.identified_flags : []);
   if (warningSignsCount) {
     warningSignsCount.textContent = `${flags.length} Flags Found`;
     warningSignsCount.className = `flags-badge-chip ${flags.length > 0 ? 'has-flags' : ''}`;
@@ -595,9 +595,9 @@ function renderAnalysisResultCard(data) {
   if (warningSignsList) {
     if (flags.length > 0) {
       warningSignsList.innerHTML = flags.map(f => {
-        const title = typeof f === 'object' ? (f.flag || f.title || 'Security Warning') : f;
+        const title = typeof f === 'object' ? (f.title || f.flag || 'Security Warning') : f;
         const quote = typeof f === 'object' && f.evidence ? f.evidence : '';
-        const reason = typeof f === 'object' && f.reason ? f.reason : '';
+        const reason = typeof f === 'object' ? (f.desc || f.reason || '') : '';
 
         return `
           <div class="warning-evidence-card">

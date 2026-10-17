@@ -33,13 +33,16 @@ class ReasoningEngine:
         has_finance = any(w in msg_lower for w in ["inr", "usd", "$", "₹", "rs", "fee", "deposit", "winner", "prize", "won"])
         is_transactional_receipt = any(w in msg_lower for w in ["recharge", "was successful", "payment received", "plan benefits", "debited", "credited"]) and not has_url
 
+        has_credentials = any(w in msg_lower for w in ["password", "otp", "pin", "cvv", "account number", "passcode", "login", "credentials", "verification code"])
+        has_suspension = any(w in msg_lower for w in ["suspend", "block", "freeze", "lock", "restrict", "deactivat", "close"])
+
         # Determine complexity level
         if is_transactional_receipt:
             complexity = "simple"
             intent_hypothesis = "Legitimate Transaction Alert / Carrier Confirmation"
             approach = "lightweight"
             required_tools = ["analyze_urgency_cues", "detect_financial_requests"]
-        elif has_url and (has_urgency or has_finance):
+        elif (has_url or has_suspension) and (has_urgency or has_finance or has_credentials):
             complexity = "complex"
             intent_hypothesis = "Multi-Vector Deceptive Lure / Phishing Vector"
             approach = "thorough"
@@ -48,10 +51,11 @@ class ReasoningEngine:
                 "check_url_shorteners",
                 "analyze_urgency_cues",
                 "detect_financial_requests",
+                "detect_credential_harvesting",
                 "identify_impersonation",
                 "extract_contact_identifiers"
             ]
-        elif has_url or has_urgency or has_finance:
+        elif has_url or has_urgency or has_finance or has_credentials:
             complexity = "moderate"
             intent_hypothesis = "Suspicious Communication / Action Request"
             approach = "standard"
@@ -59,6 +63,7 @@ class ReasoningEngine:
                 "extract_urls",
                 "analyze_urgency_cues",
                 "detect_financial_requests",
+                "detect_credential_harvesting",
                 "identify_impersonation"
             ]
         else:

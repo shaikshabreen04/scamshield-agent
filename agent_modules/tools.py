@@ -231,7 +231,40 @@ class ToolRegistry:
             category="user_context"
         ))
 
-        # 8. create_safety_checklist
+        # 8. detect_credential_harvesting
+        def _detect_credential_harvesting(message: str) -> Dict[str, Any]:
+            msg_lower = message.lower()
+            credential_indicators = [
+                (r'\b(?:password|passcode|secret\s*pin|atm\s*pin|cvv|security\s*code)\b', "Password / PIN Solicitation", "high"),
+                (r'\b(?:otp|one[- ]time\s*password|verification\s*code|auth\s*code)\b', "OTP / Verification Code Interception", "high"),
+                (r'\b(?:account\s*number|bank\s*details|bank\s*account|card\s*number|netbanking|login\s*credentials)\b', "Bank Account & Login Harvesting", "high"),
+                (r'\b(?:pan\s*card|pan\s*details|aadhaar|ssn|social\s*security)\b', "Government Identity Number Harvesting", "medium")
+            ]
+            
+            cues = []
+            for pattern, label, severity in credential_indicators:
+                matches = re.findall(pattern, msg_lower)
+                if matches:
+                    cues.append({
+                        "evidence": matches[0],
+                        "type": label,
+                        "severity": severity
+                    })
+                    
+            return {
+                "has_credential_requests": len(cues) > 0,
+                "cues": cues,
+                "count": len(cues)
+            }
+
+        self.register_tool(ToolDefinition(
+            name="detect_credential_harvesting",
+            description="Identifies requests for passwords, OTPs, PINs, card CVVs, and banking credentials.",
+            func=_detect_credential_harvesting,
+            category="core_detection"
+        ))
+
+        # 9. create_safety_checklist
         def _create_safety_checklist(signals: Dict[str, Any]) -> List[str]:
             checklist = []
             if signals.get("urls"):

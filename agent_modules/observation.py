@@ -31,6 +31,7 @@ class ObservationEngine:
         shortener_data = tool_results.get("check_url_shorteners", {})
         urgency_data = tool_results.get("analyze_urgency_cues", {})
         financial_data = tool_results.get("detect_financial_requests", {})
+        credential_data = tool_results.get("detect_credential_harvesting", {})
         impersonation_data = tool_results.get("identify_impersonation", {})
         contact_data = tool_results.get("extract_contact_identifiers", {})
         learned_matches = tool_results.get("cross_reference_learned_patterns", {})
@@ -42,6 +43,7 @@ class ObservationEngine:
             shortener_data=shortener_data,
             urgency_data=urgency_data,
             financial_data=financial_data,
+            credential_data=credential_data,
             impersonation_data=impersonation_data,
             contact_data=contact_data,
             learned_matches=learned_matches,
@@ -61,7 +63,7 @@ class ObservationEngine:
                     # Merge LLM output while enforcing risk threshold safety
                     return self._finalize_payload(llm_output, execution_results, reasoning)
             except Exception as e:
-                print(f"[ObservationEngine] LLM synthesis failed, using deterministic engine: {e}")
+                print(f"[ObservationEngine] OpenRouter API invocation returned error: {e}. Executing autonomous deterministic engine fallback.")
 
         # Deterministic synthesis fallback
         return self._build_deterministic_payload(
@@ -71,7 +73,8 @@ class ObservationEngine:
             detected_warnings=detected_warnings,
             positive_indicators=positive_indicators,
             execution_results=execution_results,
-            impersonation_data=impersonation_data
+            impersonation_data=impersonation_data,
+            credential_data=credential_data
         )
 
     def _calculate_risk_factors(
@@ -81,6 +84,7 @@ class ObservationEngine:
         shortener_data: Dict[str, Any],
         urgency_data: Dict[str, Any],
         financial_data: Dict[str, Any],
+        credential_data: Dict[str, Any],
         impersonation_data: Dict[str, Any],
         contact_data: Dict[str, Any],
         learned_matches: Dict[str, Any],
@@ -91,22 +95,68 @@ class ObservationEngine:
         positives = []
         msg_lower = message.lower()
 
-        # Check for legitimate informational receipts (e.g., recharge, transaction success)
-        is_legit_receipt = (
-            any(w in msg_lower for w in ["recharge", "was successful", "payment received", "plan benefits", "debited", "credited", "order confirmed"])
+        # Check for legitimate informational receipts and statements (no links, no threats, no credential prompts)
+        is_legit_statement_or_receipt = (
+            any(w in msg_lower for w in [
+                "recharge", "was successful", "payment received", "plan benefits", 
+                "debited", "credited", "order confirmed", "account statement", 
+                "statement is now available", "official mobile banking", "official app",
+                "review your transactions"
+            ])
             and not url_data.get("urls")
             and not shortener_data.get("has_shorteners")
+            and not credential_data.get("has_credential_requests")
+            and not urgency_data.get("urgency_detected")
             and not contact_data.get("telegram_handles")
         )
 
-        if is_legit_receipt:
-            score = 8
-            positives.append("Confirms a completed service transaction with no external links")
-            positives.append("Does not ask for passwords, OTPs, or financial transfers")
-            positives.append("Matches authentic telecommunications and payment alert patterns")
+        if is_legit_statement_or_receipt:
+            score = 5
+            positives.append("Legitimate service or account notification containing no external links or downloads")
+            positives.append("Directs user to official banking app rather than unverified third-party portals")
+            positives.append("Does not solicit passwords, PINs, OTPs, or financial transactions")
             return score, warnings, positives
 
-        # 1. URLs & Shorteners
+        # 1. Credential Harvesting (Critical Phishing Vector)
+        if credential_data.get("has_credential_requests"):
+            for cue in credential_data.get("cues", []):
+                cue_type = cue.get("type", "Credential Solicitation")
+                evidence = cue.get("evidence", "")
+                
+                if "Password" in cue_type or "PIN" in cue_type:
+                    score += 50
+                    warnings.append({
+                        "title": "Password / PIN Harvesting Attempt",
+                        "desc": "Unsolicited request for sensitive authentication secret. Legitimate institutions never ask for passwords or PINs.",
+                        "severity": "high",
+                        "evidence": evidence
+                    })
+                elif "OTP" in cue_type:
+                    score += 50
+                    warnings.append({
+                        "title": "OTP / 2FA Interception Lure",
+                        "desc": "Attempts to elicit a One-Time Password to bypass multi-factor authentication or authorize fraudulent transfers.",
+                        "severity": "high",
+                        "evidence": evidence
+                    })
+                elif "Bank Account" in cue_type:
+                    score += 35
+                    warnings.append({
+                        "title": "Financial Account Credential Request",
+                        "desc": "Requests bank account numbers or login details over insecure communication channels.",
+                        "severity": "high",
+                        "evidence": evidence
+                    })
+                else:
+                    score += 25
+                    warnings.append({
+                        "title": "Personal Identifier Solicitation",
+                        "desc": "Prompts recipient for confidential government identification details.",
+                        "severity": "medium",
+                        "evidence": evidence
+                    })
+
+        # 2. URLs & Shorteners
         if shortener_data.get("has_shorteners"):
             score += 45
             for item in shortener_data.get("items", []):
@@ -117,16 +167,16 @@ class ObservationEngine:
                     "evidence": item["url"]
                 })
         elif url_data.get("urls"):
-            score += 25
+            score += 30
             for u in url_data.get("urls", []):
                 warnings.append({
                     "title": "Unverified Hyperlink",
-                    "desc": "Message contains direct links prompting immediate navigation.",
+                    "desc": "Message contains direct links prompting immediate external navigation.",
                     "severity": "medium",
                     "evidence": u
                 })
 
-        # 2. Urgency cues
+        # 3. Urgency and Threat cues
         if urgency_data.get("urgency_detected"):
             score += 35
             for cue in urgency_data.get("cues", []):
@@ -137,7 +187,7 @@ class ObservationEngine:
                     "evidence": cue.get("evidence", "")
                 })
 
-        # 3. Financial requests
+        # 4. Financial requests
         if financial_data.get("is_lottery_claim"):
             score += 50
             warnings.append({
@@ -155,7 +205,7 @@ class ObservationEngine:
                 "evidence": "Deposit or processing fee request"
             })
 
-        # 4. Impersonation
+        # 5. Impersonation
         if impersonation_data.get("impersonation_suspected"):
             score += 30
             for brand in impersonation_data.get("categories", []):
@@ -166,7 +216,7 @@ class ObservationEngine:
                     "evidence": brand
                 })
 
-        # 5. Telegram / Anonymous Handles
+        # 6. Telegram / Anonymous Handles
         if contact_data.get("telegram_handles"):
             score += 30
             for handle in contact_data.get("telegram_handles", []):
@@ -176,6 +226,16 @@ class ObservationEngine:
                     "severity": "medium",
                     "evidence": handle
                 })
+
+        # 7. COMPOUND PHISHING THREAT COMBINATION
+        # A message asking for credentials (password/OTP/account) combined with link or urgency is a textbook critical phishing attack.
+        has_creds = credential_data.get("has_credential_requests")
+        has_links = bool(url_data.get("urls") or shortener_data.get("has_shorteners"))
+        has_urgency = urgency_data.get("urgency_detected")
+        
+        if has_creds and (has_links or has_urgency):
+            # Critical phishing combination: force high severity
+            score = max(score, 92)
 
         # Check learned patterns from memory
         if learned_matches.get("matches_found"):
@@ -282,26 +342,37 @@ UNTRUSTED MESSAGE:
         detected_warnings: List[Dict[str, Any]],
         positive_indicators: List[str],
         execution_results: Dict[str, Any],
-        impersonation_data: Dict[str, Any]
+        impersonation_data: Dict[str, Any],
+        credential_data: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
+        has_creds = bool(credential_data and credential_data.get("has_credential_requests"))
+        impersonated_brand = impersonation_data.get("categories", [None])[0] if impersonation_data else None
+
         if calculated_score >= 70:
             risk_level = "high"
-            intent = impersonation_data.get("categories", ["Credential Phishing / Scam Lure"])[0]
-            summary = "High-risk deceptive message exhibiting known fraudulent cues including urgent coercion, obfuscated links, or upfront fee demands."
+            if has_creds:
+                intent = f"{impersonated_brand} Phishing & Credential Theft" if impersonated_brand else "Credential Phishing / Account Takeover Threat"
+                summary = "Critical high-risk threat: Message attempts to harvest sensitive passwords, OTPs, or banking identifiers through coercive deception."
+            elif impersonated_brand:
+                intent = impersonated_brand
+                summary = f"High-risk deceptive message impersonating {impersonated_brand} with malicious links or urgent threats."
+            else:
+                intent = "Deceptive Phishing / Fraud Lure"
+                summary = "High-risk deceptive message exhibiting known fraudulent cues including urgent coercion, obfuscated links, or upfront fee demands."
         elif calculated_score >= 35:
             risk_level = "medium"
-            intent = "Unverified Solicitation / Suspicious Communication"
+            intent = impersonated_brand or "Unverified Solicitation / Suspicious Communication"
             summary = "Potentially risky communication featuring unverified contact details, unusual employment offers, or payment requests."
         else:
             risk_level = "low"
-            intent = "Legitimate Transaction or Neutral Message"
+            intent = "Legitimate Transaction or Official Account Notice"
             summary = "This message demonstrates standard informational patterns and contains no overt phishing links, credential harvesting prompts, or coercive threats."
 
         return {
             "source": "deterministic_engine",
             "risk_level": risk_level,
             "risk_score": calculated_score,
-            "confidence": "high" if calculated_score >= 80 or calculated_score <= 15 else "medium",
+            "confidence": "high" if calculated_score >= 70 or calculated_score <= 20 else "medium",
             "message_intent": intent,
             "summary": summary,
             "warning_signs": detected_warnings,
