@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spam Buster — AI Powered Scam Detector</title>
+  <meta name="description" content="Detect Scams. Stay Safe. AI analyzes messages, emails and WhatsApp texts to detect spam, fraud and suspicious content.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark-spambuster">
+  <div class="sb-app-layout" id="app">
+    
+    <!-- Left Sidebar Navigation -->
+    <aside class="sb-sidebar" id="sidebar">
+      <!-- Brand Logo -->
+      <div class="sidebar-brand-box">
+        <a href="#dashboard" class="sb-brand-logo" id="brandLink">
+          <div class="brand-shield-glow">
+            <svg viewBox="0 0 24 24" fill="none" class="brand-shield-svg">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="url(#brandGlowGrad)" />
+              <path d="M9 12l2 2 4-4" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs>
+                <linearGradient id="brandGlowGrad" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#8b5cf6" />
+                  <stop offset="1" stop-color="#3b82f6" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="brand-text-col">
+            <span class="brand-name">Spam Buster</span>
+            <span class="brand-sub">AI Powered Scam Detector</span>
+          </div>
+        </a>
+        <button class="mobile-close-btn" id="mobileCloseBtn" aria-label="Close sidebar">&times;</button>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="sidebar-nav-menu">
+        <a href="#dashboard" class="nav-btn active" data-view="dashboard" id="navHome">
+          <span class="nav-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </span>
+          <span class="nav-label">Home</span>
+        </a>
+
+        <a href="#analyze" class="nav-btn" data-view="analyze" id="navAnalyze">
+          <span class="nav-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </span>
+          <span class="nav-label">Analyze Message</span>
+        </a>
+
+        <a href="#history" class="nav-btn" data-view="history" id="navHistory">
+          <span class="nav-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </span>
+          <span class="nav-label">Scan History</span>
+          <span class="nav-pill-count" id="sidebarHistoryBadge">16</span>
+        </a>
+
+        <a href="#safety" class="nav-btn" data-view="safety" id="navSafety">
+          <span class="nav-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </span>
+          <span class="nav-label">Safety Tips</span>
+        </a>
+
+        <a href="#settings" class="nav-btn" data-view="settings" id="navSettings">
+          <span class="nav-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Bottom Promo Card -->
+      <div class="sidebar-bottom-card">
+        <div class="bottom-shield-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#3b82f6" fill-opacity="0.2" stroke="#60a5fa" stroke-width="2"/>
+            <path d="M9 12l2 2 4-4" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="bottom-card-content">
+          <span class="bottom-card-title">Stay Safe Online</span>
+          <span class="bottom-card-sub">Think. Check. Stay Protected.</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace Panel -->
+    <div class="sb-main-panel">
+      
+      <!-- Top Bar Header -->
+      <header class="sb-top-header">
+        <div class="header-left-col">
+          <button class="mobile-toggle-btn" id="mobileToggleBtn" aria-label="Toggle navigation">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="greeting-wrap">
+            <h1 class="greeting-title" id="greetingHeader">Hello, there! 👋</h1>
+            <p class="greeting-subtitle" id="greetingSub">Paste a message, email, or WhatsApp text to check if it's spam.</p>
+          </div>
+        </div>
+
+        <div class="header-right-col">
+          <!-- Backend Status Badge -->
+          <div class="header-engine-pill" id="aiStatusPill" title="OpenRouter LangChain Engine">
+            <span class="engine-dot-pulse"></span>
+            <span class="engine-text">AI Engine: Online (OpenRouter / Free)</span>
+            <span class="engine-arrow">→</span>
+          </div>
+
+          <!-- User Avatar Menu -->
+          <div class="user-profile-pill">
+            <div class="user-avatar-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <span class="user-name-text">User</span>
+            <span class="user-chevron">▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Scrollable Main View Area -->
+      <main class="sb-content-body">
+
+        <!-- ======================================================== -->
+        <!-- VIEW 1: HOME PAGE DASHBOARD (REQUESTED IN SCREENSHOT 1) -->
+        <!-- ======================================================== -->
+        <section class="view-pane active" id="view-dashboard">
+          
+          <!-- Hero Section with Artwork -->
+          <div class="home-hero-card">
+            <div class="home-hero-bg-art" style="background-image: url('assets/scam_buster_hero.jpg');"></div>
+            <div class="home-hero-overlay"></div>
+            <div class="home-hero-content">
+              <div class="home-badge-tag">
+                <span>✨</span>
+                <span>Next-Gen AI Fraud Defense</span>
+              </div>
+              <h2 class="home-hero-heading">Protect Your Identity & Money From Modern Scams</h2>
+              <p class="home-hero-sub">Our neural analysis engine inspects SMS, WhatsApp messages, Telegram job offers, and payment links in real-time using LangChain & OpenRouter AI.</p>
+              
+              <div class="home-hero-btn-row">
+                <a href="#analyze" class="btn-home-primary">
+                  <span>Start Free Analysis →</span>
+                </a>
+                <a href="#safety" class="btn-home-secondary">
+                  <span>Explore Safety Tips</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Stat Summary Cards -->
+          <div class="home-stats-quad">
+            <div class="dark-panel-card home-stat-box">
+              <div class="home-stat-top">
+                <span class="home-stat-label">Total Messages Inspected</span>
+                <span class="home-stat-icon purple">📊</span>
+              </div>
+              <span class="home-stat-val" id="homeTotalCount">48</span>
+              <span class="home-stat-desc">Synchronized with SQLite database</span>
+            </div>
+
+            <div class="dark-panel-card home-stat-box">
+              <div class="home-stat-top">
+                <span class="home-stat-label">High-Risk Scams Blocked</span>
+                <span class="home-stat-icon red">🚨</span>
+              </div>
+              <span class="home-stat-val red" id="homeThreatCount">18</span>
+              <span class="home-stat-desc">Phishing & advance-fee traps neutralized</span>
+            </div>
+
+            <div class="dark-panel-card home-stat-box">
+              <div class="home-stat-top">
+                <span class="home-stat-label">Verified Safe Messages</span>
+                <span class="home-stat-icon green">🛡️</span>
+              </div>
+              <span class="home-stat-val green" id="homeSafeCount">30</span>
+              <span class="home-stat-desc">Legitimate transaction alerts & OTPs</span>
+            </div>
+
+            <div class="dark-panel-card home-stat-box">
+              <div class="home-stat-top">
+                <span class="home-stat-label">Threat Detection Accuracy</span>
+                <span class="home-stat-icon blue">⚡</span>
+              </div>
+              <span class="home-stat-val blue">98.4%</span>
+              <span class="home-stat-desc">Powered by LangChain + OpenRouter AI</span>
+            </div>
+          </div>
+
+          <!-- Common Threat Vectors Monitored -->
+          <div class="home-vectors-section">
+            <div class="section-title-wrap">
+              <h3 class="section-title">Common Scam Vectors Monitored</h3>
+              <p class="section-desc">Real-time detection across all major consumer fraud categories</p>
+            </div>
+
+            <div class="home-vectors-grid">
+              <div class="dark-panel-card vector-card">
+                <div class="vector-badge red">Urgent Threat</div>
+                <div class="vector-icon">🏦</div>
+                <h4 class="vector-title">Bank KYC & Account Freeze</h4>
+                <p class="vector-desc">Fake SMS messages threatening immediate bank account suspension unless you click an unverified link.</p>
+                <a href="#analyze" class="vector-test-link" data-sample="bank-kyc">Test Example →</a>
+              </div>
+
+              <div class="dark-panel-card vector-card">
+                <div class="vector-badge amber">High Fraud</div>
+                <div class="vector-icon">💼</div>
+                <h4 class="vector-title">Telegram Task & Work Scams</h4>
+                <p class="vector-desc">Promises of ₹3,000–₹5,000 daily for liking videos or rating hotels, requiring upfront deposits to unlock payouts.</p>
+                <a href="#analyze" class="vector-test-link" data-sample="fake-job">Test Example →</a>
+              </div>
+
+              <div class="dark-panel-card vector-card">
+                <div class="vector-badge red">Phishing Trap</div>
+                <div class="vector-icon">📦</div>
+                <h4 class="vector-title">Package Redelivery Fee</h4>
+                <p class="vector-desc">Postal and courier notifications demanding a $1.49 address update fee to steal payment card credentials.</p>
+                <a href="#analyze" class="vector-test-link" data-sample="delivery-reschedule">Test Example →</a>
+              </div>
+
+              <div class="dark-panel-card vector-card">
+                <div class="vector-badge blue">Lottery Scam</div>
+                <div class="vector-icon">🎁</div>
+                <h4 class="vector-title">WhatsApp Lucky Draw</h4>
+                <p class="vector-desc">Notices claiming you won ₹25,00,000 and requesting upfront processing tax transfers.</p>
+                <a href="#analyze" class="vector-test-link" data-sample="lottery-prize">Test Example →</a>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 2: ANALYZE MESSAGE (WITH RICH DEEP ANALYSIS & GAUGE)-->
+        <!-- ======================================================== -->
+        <section class="view-pane" id="view-analyze">
+          
+          <div class="two-column-dashboard-grid">
+            
+            <!-- LEFT COLUMN: Input, Banner & Recent Scans -->
+            <div class="dashboard-left-column">
+              
+              <!-- 1. Hero Promo Banner with 3D Shield -->
+              <div class="dark-hero-banner">
+                <div class="hero-banner-content">
+                  <h2 class="hero-banner-title">Detect Scams. <span class="purple-highlight">Stay Safe.</span></h2>
+                  <p class="hero-banner-desc">Our AI analyzes messages, emails and WhatsApp texts to detect spam, fraud and suspicious content.</p>
+                </div>
+                <div class="hero-shield-3d-box">
+                  <svg viewBox="0 0 100 100" class="shield-3d-svg">
+                    <defs>
+                      <linearGradient id="shieldGrad3d" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#a855f7"/>
+                        <stop offset="50%" stop-color="#6366f1"/>
+                        <stop offset="100%" stop-color="#3b82f6"/>
+                      </linearGradient>
+                      <filter id="shieldNeonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#8b5cf6" flood-opacity="0.6"/>
+                      </filter>
+                    </defs>
+                    <path d="M50 85s30-15 30-40V22L50 10 20 22v23c0 25 30 40 30 40z" fill="url(#shieldGrad3d)" filter="url(#shieldNeonGlow)"/>
+                    <path d="M38 48l8 8 16-16" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="82" cy="18" r="3" fill="#38bdf8"/>
+                    <circle cx="16" cy="42" r="2.5" fill="#c084fc"/>
+                    <polygon points="85,35 88,40 93,42 88,44 85,49 82,44 77,42 82,40" fill="#a855f7" opacity="0.8"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- 2. Message Input Card -->
+              <div class="dark-panel-card message-input-card">
+                <div class="input-card-header">
+                  <div class="input-header-left">
+                    <span class="input-icon-chat">💬</span>
+                    <span class="input-title">Enter Your Message</span>
+                  </div>
+                  <button type="button" class="btn-clear-ghost" id="clearInputBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    <span>Clear</span>
+                  </button>
+                </div>
+
+                <!-- Textarea -->
+                <div class="textarea-wrapper">
+                  <textarea 
+                    id="messageInput" 
+                    class="dark-smart-textarea" 
+                    rows="6" 
+                    placeholder="Paste your message, email, or WhatsApp text here..."
+                    maxlength="3000"
+                  ></textarea>
+                  <span class="char-count-badge">
+                    <span id="charCount">0</span>/3000
+                  </span>
+                </div>
+
+                <!-- Quick Examples Chips -->
+                <div class="quick-examples-section">
+                  <div class="quick-examples-label">
+                    <span>💡</span> Quick Examples
+                  </div>
+                  <div class="quick-chips-row" id="sampleChipsGroup">
+                    <button type="button" class="dark-chip-item" data-sample="bank-kyc">
+                      <span class="chip-icon">🏦</span> Bank KYC SMS
+                    </button>
+                    <button type="button" class="dark-chip-item" data-sample="lottery-prize">
+                      <span class="chip-icon">🎁</span> Lottery Prize
+                    </button>
+                    <button type="button" class="dark-chip-item" data-sample="fake-job">
+                      <span class="chip-icon">✈️</span> Telegram Job
+                    </button>
+                    <button type="button" class="dark-chip-item" data-sample="delivery-reschedule">
+                      <span class="chip-icon">📦</span> Delivery Fee
+                    </button>
+                    <button type="button" class="dark-chip-item" data-sample="legit-otp">
+                      <span class="chip-icon">🔒</span> Login Code
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Big Primary Action Button -->
+                <button type="button" class="btn-gradient-detect" id="analyzeBtn">
+                  <span class="btn-spinner-ring" id="btnSpinner" style="display: none;"></span>
+                  <span class="btn-sparkle-icon" id="btnIcon">✨</span>
+                  <span id="btnText">Detect Spam →</span>
+                </button>
+
+                <!-- Privacy Guarantee Banner -->
+                <div class="privacy-guarantee-note">
+                  <div class="privacy-shield-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    </svg>
+                  </div>
+                  <div class="privacy-note-text">
+                    <strong>Your privacy matters</strong>
+                    <span>Messages are analyzed securely without storing your personal data.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Recent Scans Table (SQLite Linked) -->
+              <div class="dark-panel-card recent-scans-card">
+                <div class="recent-scans-header">
+                  <div class="recent-title-group">
+                    <span class="recent-folder-icon">🗂️</span>
+                    <span class="recent-title">Recent Scans</span>
+                  </div>
+                  <a href="#history" class="view-all-link" id="viewAllRecentLink">View All →</a>
+                </div>
+
+                <div class="recent-table-scroll">
+                  <table class="recent-scans-table">
+                    <thead>
+                      <tr>
+                        <th>Message Preview</th>
+                        <th>Result</th>
+                        <th>Confidence</th>
+                        <th>Time</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentTableBody">
+                      <!-- Rendered dynamically from SQLite -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Detailed AI Analysis Output & Metrics -->
+            <div class="dashboard-right-column">
+              
+              <!-- 1. Circular Gauge & Verdict Box (With Low/Med/High Colors) -->
+              <div class="dark-panel-card analysis-result-card" id="analysisResultCard">
+                <div class="result-card-header">
+                  <div class="result-card-title-group">
+                    <span class="result-clipboard-icon">📋</span>
+                    <span class="result-card-title">Analysis Result</span>
+                  </div>
+                  <span class="last-scan-timestamp" id="lastScanTime">Last scan: Just now</span>
+                </div>
+
+                <!-- Circular Gauge & Status Summary Row (Image 3 Aesthetic) -->
+                <div class="gauge-and-verdict-row">
+                  
+                  <!-- Circular Gauge with SVG Progress Ring -->
+                  <div class="verdict-gauge-box">
+                    <svg class="circular-ring-svg" viewBox="0 0 120 120">
+                      <circle class="ring-track" cx="60" cy="60" r="48"></circle>
+                      <circle class="ring-fill" id="verdictRingFill" cx="60" cy="60" r="48"></circle>
+                    </svg>
+                    <div class="gauge-center-content">
+                      <span class="gauge-verdict-status" id="gaugeVerdictStatus">NOT SPAM</span>
+                      <span class="gauge-percent-val" id="gaugePercentVal">96%</span>
+                      <span class="gauge-conf-sub">CONFIDENCE</span>
+                    </div>
+                  </div>
+
+                  <!-- Text Verdict & Detailed Meta -->
+                  <div class="verdict-text-column">
+                    <div class="verdict-badge-pill safe" id="verdictBadgePill">
+                      <span class="pill-check" id="verdictBadgeIcon">✔</span>
+                      <span id="verdictBadgeText">Safe & Legitimate</span>
+                    </div>
+                    <p class="verdict-summary-line" id="verdictSummaryLine">
+                      This message appears to be genuine and does not show typical signs of spam or scam.
+                    </p>
+                    <div class="analysis-meta-mini-list">
+                      <div class="meta-item-row">
+                        <span class="meta-item-left">🛡️ Risk Score</span>
+                        <span class="meta-item-right score-val safe" id="riskScoreVal">4 / 100</span>
+                      </div>
+                      <div class="meta-item-row">
+                        <span class="meta-item-left">⚙️ AI Analysis Engine</span>
+                        <span class="meta-item-right" id="engineMetaText">Scam Buster Neural AI</span>
+                      </div>
+                      <div class="meta-item-row">
+                        <span class="meta-item-left">💬 Message Type</span>
+                        <span class="meta-item-right" id="messageTypeMetaText">SMS / Text</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Intent Classification Banner -->
+                <div class="intent-classified-box" id="intentBox">
+                  <span class="intent-badge-icon">🎯</span>
+                  <div class="intent-texts">
+                    <span class="intent-sub-tag">DETECTED MESSAGE INTENT</span>
+                    <span class="intent-main-title" id="intentTitleText">Legitimate Transaction Alert</span>
+                  </div>
+                </div>
+
+                <!-- AI Assessment Summary Section -->
+                <div class="analysis-section-block">
+                  <h4 class="analysis-section-title">
+                    <span>📋</span> AI Fraud Assessment Summary
+                  </h4>
+                  <div class="assessment-paragraph-box" id="assessmentBox">
+                    The message appears to be a standard mobile recharge confirmation for Rs. 299. It contains no links, requests for personal information, or urgent threats, matching the pattern of a legitimate transaction alert.
+                  </div>
+                </div>
+
+                <!-- Detected Warning Signs & Evidence Section -->
+                <div class="analysis-section-block">
+                  <div class="analysis-section-split">
+                    <h4 class="analysis-section-title">
+                      <span>🔍</span> Detected Warning Signs & Evidence
+                    </h4>
+                    <span class="flags-badge-chip" id="warningSignsCount">0 Flags Found</span>
+                  </div>
+                  <div class="warning-cards-list" id="warningSignsList">
+                    <div class="clean-state-box">
+                      <div class="clean-header">
+                        <strong>No High-Risk Patterns Detected</strong>
+                        <span class="clean-pill">CLEAN</span>
+                      </div>
+                      <p>No deceptive hyperlinks, urgent freeze threats, or advance-fee requests were identified.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Positive / Neutral Indicators Section -->
+                <div class="analysis-section-block" id="positiveIndicatorsBlock">
+                  <h4 class="analysis-section-title">
+                    <span>🛡️</span> Positive / Neutral Indicators
+                  </h4>
+                  <div class="positive-indicators-grid" id="positiveIndicatorsGrid">
+                    <div class="positive-chip-card">
+                      <span>✓</span>
+                      <span>No URLs or link shorteners present</span>
+                    </div>
+                    <div class="positive-chip-card">
+                      <span>✓</span>
+                      <span>No requests for money, payments, or financial information</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4-Point Quick Checks -->
+                <div class="analysis-section-block">
+                  <h4 class="analysis-section-title">
+                    <span>📄</span> Message Technical Signals
+                  </h4>
+                  <div class="analysis-checks-list" id="analysisChecksList">
+                    <div class="check-item-row pass">
+                      <span class="check-state-icon">✔</span>
+                      <span class="check-state-text">No suspicious links detected</span>
+                    </div>
+                    <div class="check-item-row pass">
+                      <span class="check-state-icon">✔</span>
+                      <span class="check-state-text">No financial risk keywords</span>
+                    </div>
+                    <div class="check-item-row pass">
+                      <span class="check-state-icon">✔</span>
+                      <span class="check-state-text">No urgent or threatening language</span>
+                    </div>
+                    <div class="check-item-row pass">
+                      <span class="check-state-icon">✔</span>
+                      <span class="check-state-text">No unusual sender pattern</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Report Action Buttons -->
+                <div class="result-card-actions">
+                  <button type="button" class="btn-action-sm" id="copyReportBtn">
+                    <span>📋</span> Copy Report
+                  </button>
+                  <button type="button" class="btn-action-sm" id="downloadJsonBtn">
+                    <span>💾</span> Export JSON
+                  </button>
+                </div>
+
+              </div>
+
+              <!-- 2. Safety Tip Card -->
+              <div class="dark-panel-card safety-tip-card">
+                <div class="safety-tip-left">
+                  <span class="tip-bulb-icon">💡</span>
+                  <div class="tip-body">
+                    <span class="tip-title-sm">Safety Tip</span>
+                    <p class="tip-text-sm" id="safetyTipText">Always double-check links, avoid sharing OTPs, and be cautious with unknown senders.</p>
+                  </div>
+                </div>
+                <span class="tip-chevron">›</span>
+              </div>
+
+              <!-- 3. Scan Statistics 2x2 Grid -->
+              <div class="dark-panel-card scan-stats-card">
+                <div class="stats-card-header">
+                  <div class="stats-header-left">
+                    <span class="stats-bar-icon">📊</span>
+                    <span class="stats-title-text">Scan Statistics</span>
+                  </div>
+                  <div class="stats-time-dropdown">
+                    <span>Last 7 days</span>
+                    <span class="dropdown-arrow">▾</span>
+                  </div>
+                </div>
+
+                <div class="stats-quad-grid">
+                  <div class="stat-quad-tile tile-blue">
+                    <div class="tile-icon-box blue">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                      </svg>
+                    </div>
+                    <div class="tile-text-wrap">
+                      <span class="tile-label">Total Scans</span>
+                      <span class="tile-number" id="statTotalScans">48</span>
+                    </div>
+                  </div>
+
+                  <div class="stat-quad-tile tile-red">
+                    <div class="tile-icon-box red">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                      </svg>
+                    </div>
+                    <div class="tile-text-wrap">
+                      <span class="tile-label">Spam Detected</span>
+                      <span class="tile-number red" id="statSpamDetected">18</span>
+                    </div>
+                  </div>
+
+                  <div class="stat-quad-tile tile-green">
+                    <div class="tile-icon-box green">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                      </svg>
+                    </div>
+                    <div class="tile-text-wrap">
+                      <span class="tile-label">Safe Messages</span>
+                      <span class="tile-number green" id="statSafeMessages">30</span>
+                    </div>
+                  </div>
+
+                  <div class="stat-quad-tile tile-purple">
+                    <div class="tile-icon-box purple">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                      </svg>
+                    </div>
+                    <div class="tile-text-wrap">
+                      <span class="tile-label">Spam Rate</span>
+                      <span class="tile-number purple" id="statSpamRate">37.5%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 3: FULL SCAN HISTORY VIEW (NAVIGABLE)               -->
+        <!-- ======================================================== -->
+        <section class="view-pane" id="view-history">
+          <div class="pane-header-row">
+            <div>
+              <h2 class="pane-title">Scan History</h2>
+              <p class="pane-subtitle">Persistent SQLite database records of every message evaluated by Spam Buster.</p>
+            </div>
+            <div class="history-chips-filter" id="historyFilterGroup">
+              <button class="history-chip active" data-filter="all">All (<span id="filterAllCount">16</span>)</button>
+              <button class="history-chip" data-filter="high">Spam</button>
+              <button class="history-chip" data-filter="medium">Potential Risk</button>
+              <button class="history-chip" data-filter="low">Not Spam</button>
+            </div>
+          </div>
+
+          <div class="history-controls-bar">
+            <div class="history-search-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="historySearchInput" placeholder="Search by text, intent, or scan ID..." class="history-search-input">
+            </div>
+            <button type="button" class="btn-clear-history" id="clearHistoryBtn" title="Reset scan records in SQLite">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>Reset History</span>
+            </button>
+          </div>
+
+          <div class="dark-panel-card full-history-card">
+            <div class="table-scroll-area">
+              <table class="history-data-table" id="historyTable">
+                <thead>
+                  <tr>
+                    <th>Scan ID</th>
+                    <th>Time</th>
+                    <th>Intent & Excerpt</th>
+                    <th>Result & Score</th>
+                    <th>Identified Flags</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                  <!-- Populated dynamically via SQLite API -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 4: SAFETY TIPS (NAVIGABLE)                          -->
+        <!-- ======================================================== -->
+        <section class="view-pane" id="view-safety">
+          <div class="pane-header-row">
+            <div>
+              <h2 class="pane-title">Cyber Safety Guidelines</h2>
+              <p class="pane-subtitle">Practical rules to stay protected from phishing, job scams, and fraudulent traps.</p>
+            </div>
+          </div>
+
+          <div class="safety-grid-cards">
+            <div class="dark-panel-card tip-item-card">
+              <div class="tip-card-badge red">💳</div>
+              <h3 class="tip-title">Bank KYC & Account Freeze Traps</h3>
+              <p class="tip-desc">Scammers claim your account or card will be blocked within 24 hours unless you tap an unverified bit.ly link.</p>
+              <div class="tip-advice-box">
+                <strong>Safety Rule:</strong> Real banks never send SMS links to update KYC. Open your official bank app directly.
+              </div>
+            </div>
+
+            <div class="dark-panel-card tip-item-card">
+              <div class="tip-card-badge amber">📦</div>
+              <h3 class="tip-title">Fake Delivery & Redelivery Fees</h3>
+              <p class="tip-desc">Messages asking you to pay a nominal fee ($1.49 or ₹50) to update your street address for an undelivered parcel.</p>
+              <div class="tip-advice-box">
+                <strong>Safety Rule:</strong> The clone website steals your CVV and OTP. Only track shipments on official courier websites.
+              </div>
+            </div>
+
+            <div class="dark-panel-card tip-item-card">
+              <div class="tip-card-badge purple">💼</div>
+              <h3 class="tip-title">Telegram Video-Liking & Task Jobs</h3>
+              <p class="tip-desc">Promises of ₹3,000–₹5,000 daily for liking videos or rating hotels, requiring an upfront "security deposit".</p>
+              <div class="tip-advice-box">
+                <strong>Safety Rule:</strong> Legitimate employers never ask candidates to pay money to get hired or unlock salary withdrawals.
+              </div>
+            </div>
+
+            <div class="dark-panel-card tip-item-card">
+              <div class="tip-card-badge green">📞</div>
+              <h3 class="tip-title">National Cyber Crime Helpline</h3>
+              <p class="tip-desc">If you inadvertently entered your banking credentials or transferred funds to a fraudster:</p>
+              <div class="tip-advice-box">
+                <p>• Call <strong>1930</strong> (India) or visit <a href="https://cybercrime.gov.in" target="_blank" rel="noopener">cybercrime.gov.in</a></p>
+                <p>• Freeze your credit/debit card immediately inside your official mobile banking app.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 5: SETTINGS (NAVIGABLE)                             -->
+        <!-- ======================================================== -->
+        <section class="view-pane" id="view-settings">
+          <div class="pane-header-row">
+            <div>
+              <h2 class="pane-title">Settings & System Info</h2>
+              <p class="pane-subtitle">Manage preferences and verify backend integration.</p>
+            </div>
+          </div>
+
+          <div class="settings-two-cards">
+            <div class="dark-panel-card">
+              <h3 class="settings-sec-title">Backend Architecture</h3>
+              <p class="settings-sec-desc">Your autonomous AI agent is connected via secure REST bridge with local persistence.</p>
+              <div class="architecture-pills-box">
+                <div class="arch-row">
+                  <span class="arch-dot green"></span>
+                  <span class="arch-label">Model Provider:</span>
+                  <span class="arch-val">OpenRouter (openrouter/free)</span>
+                </div>
+                <div class="arch-row">
+                  <span class="arch-dot purple"></span>
+                  <span class="arch-label">Persistence Engine:</span>
+                  <span class="arch-val">SQLite Encrypted Storage</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dark-panel-card">
+              <h3 class="settings-sec-title">Preferences</h3>
+              <div class="pref-switch-row">
+                <div>
+                  <span class="pref-title">Auto-refresh scan statistics</span>
+                  <span class="pref-desc">Sync counters with SQLite database every 15s</span>
+                </div>
+                <label class="switch-toggle">
+                  <input type="checkbox" id="toggleAutoSync" checked>
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scan Detail Modal -->
+  <div class="modal-backdrop" id="scanDetailModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="modal-id-badge" id="modalScanId">SB-1042</span>
+          <span class="modal-status-badge" id="modalRiskBadge">Safe & Legitimate</span>
+          <span class="modal-timestamp" id="modalTimestamp">Just now</span>
+        </div>
+        <button type="button" class="modal-close-btn" id="modalCloseBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body" id="modalBody">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-copy" id="modalCopyBtn">
+          <span>📋</span> Copy Report
+        </button>
+        <button type="button" class="btn-modal-close" id="modalDoneBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
