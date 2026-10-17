@@ -20,12 +20,13 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-# Import the existing agent and structured analysis function
+# Import the Real AI Agent and structured analysis functions
 try:
-    from agent import agent, analyze_scam_structured, extract_deterministic_signals
-    print("✓ Successfully connected to LangChain agent & structured engine from agent.py")
+    from agent import agent, scam_agent, analyze_scam_structured, extract_deterministic_signals
+    print("✓ Successfully connected to Real AI Agent Architecture from agent.py")
 except Exception as e:
     agent = None
+    scam_agent = None
     analyze_scam_structured = None
     extract_deterministic_signals = None
     print(f"⚠️ Warning: Could not import from agent.py: {e}")
@@ -296,11 +297,12 @@ class ScamBusterAPIHandler(SimpleHTTPRequestHandler):
             stats = get_stats()
             status_data = {
                 "status": "online",
-                "agent_available": agent is not None,
+                "agent_available": (scam_agent is not None) or (agent is not None),
                 "model": "openrouter/free",
-                "backend": "LangChain + OpenRouter",
+                "architecture": "Real AI Agent Architecture (Think -> Plan -> Act -> Observe -> Learn)",
+                "backend": "Scam Buster Autonomous Agent Loop + SQLite",
                 "stats": stats,
-                "message": "Scam Buster Live Agent Engine is fully operational"
+                "message": "Scam Buster Autonomous Real AI Agent is fully operational"
             }
             self.wfile.write(json.dumps(status_data).encode("utf-8"))
             return
@@ -334,6 +336,7 @@ class ScamBusterAPIHandler(SimpleHTTPRequestHandler):
             try:
                 data = json.loads(post_data)
                 message = data.get("message", "").strip()
+                user_id = data.get("user_id", "default_user")
 
                 if not message:
                     self.send_response(400)
@@ -343,11 +346,11 @@ class ScamBusterAPIHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(json.dumps({"error": "Empty message supplied"}).encode("utf-8"))
                     return
 
-                print(f"\n[Scam Buster] Live analysis requested: {message[:60]}...")
+                print(f"\n[Scam Buster] Real AI Agent analysis requested for user '{user_id}': {message[:60]}...")
                 
-                # Run structured scam analysis via agent.py
+                # Run structured scam analysis via Real AI Agent
                 if analyze_scam_structured:
-                    analysis = analyze_scam_structured(message)
+                    analysis = analyze_scam_structured(message, user_id=user_id)
                 else:
                     raise RuntimeError("analyze_scam_structured is not available")
 
@@ -383,6 +386,47 @@ class ScamBusterAPIHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
                 except Exception:
                     pass
+            return
+
+        if self.path == "/api/feedback":
+            content_length = int(self.headers.get("Content-Length", 0))
+            post_data = self.rfile.read(content_length).decode("utf-8")
+            try:
+                data = json.loads(post_data)
+                scan_id = data.get("scan_id", "")
+                user_id = data.get("user_id", "default_user")
+                original_risk_level = data.get("original_risk_level", "medium")
+                corrected_risk_level = data.get("corrected_risk_level", "low")
+                feedback_type = data.get("feedback_type", "false_positive")
+                message_text = data.get("message", "")
+                reasoning = data.get("reasoning", "")
+
+                print(f"[Scam Buster] Processing user feedback for scan {scan_id} (correction: {original_risk_level} -> {corrected_risk_level})")
+                if scam_agent:
+                    fb_res = scam_agent.process_feedback(
+                        scan_id=scan_id,
+                        user_id=user_id,
+                        original_risk_level=original_risk_level,
+                        corrected_risk_level=corrected_risk_level,
+                        feedback_type=feedback_type,
+                        message_text=message_text,
+                        reasoning=reasoning
+                    )
+                else:
+                    fb_res = {"success": True, "message": "Feedback noted"}
+
+                self.send_response(200)
+                self._send_cors_headers()
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps(fb_res).encode("utf-8"))
+            except Exception as e:
+                print(f"[Scam Buster] Error processing feedback: {e}")
+                self.send_response(500)
+                self._send_cors_headers()
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
             return
 
         if self.path == "/api/history/clear":
